@@ -1,43 +1,68 @@
-(function(){
-  'use strict';
+(function () {
+'use strict';
 
-  angular.module('LunchCheck', [])
-  .controller('LunchController', LunchController);
+const NO_DATA = "Please, enter data first.";
+const OK_ENJOY = "Enjoy!";
+const OK_TOOMUCH = "Too much!";
 
-  LunchController.$inject = ['$scope'];
+angular.module('LunchCheck', [])
 
-  function LunchController($scope){
+.controller('LunchController', LunchController);
 
-    $scope.countLunch = function(){
-      var count = 0;
-      var lunches = $scope.lunchInput;
+LunchController.$inject = ['$scope'];
 
-      if(!lunches){
-        $scope.message = "Please enter data first";
-        $scope.messageStyle = {'color': 'red'};
-        $scope.inputStyle = {'border-color': 'red'};
-      } else {
-        for(let lunch of lunches.split(',')){
-          if(lunch === '' || lunch === ' '){
-            count += 0;
-          } else {
-            count++;
-          }
-        }
-        if(count === 0){
-          $scope.message = "Please enter data first";
-          $scope.messageStyle = {'color': 'red'};
-          $scope.inputStyle = {'border-color': 'red'};
-        } else if (count <= 3){
-          $scope.message = "Enjoy!";
-          $scope.messageStyle = {'color': 'green'};
-          $scope.inputStyle = {'border-color': 'green'};
-        } else {
-          $scope.message = "Too Much!";
-          $scope.messageStyle = {'color': 'green'};
-          $scope.inputStyle = {'border-color': 'green'};
-        }
+function LunchController($scope){
+
+  $scope.breakfastList = '';
+  $scope.message = '';
+  $scope.color = '';
+
+  $scope.checkTooMuchLunch = function(){
+    if ($scope.breakfastList == ''){
+        $scope.message = 'Please, enter data first.';
+        $scope.color = 'red';
+
+    }else{
+      $scope.message = getStringSplitted($scope.breakfastList);
+      if($scope.message == NO_DATA){
+          $scope.color = 'red';
+      }else{
+          $scope.color = 'green';
+      }
+
+
+    }
+
+  };
+
+
+  //gets a string splitted in an array
+  //and returns a message
+  function getStringSplitted(stringToSplit){
+
+    var separator = ",";
+    var arrayOfItems = stringToSplit.split(separator);
+    var finalLength = 0; //stores the number of items without empty spaces
+
+    //not taking into consideration empty items
+    var totalItemsEmpty = 0;
+    var counter;
+    for (counter = 0; counter < arrayOfItems.length; counter++){
+      if (arrayOfItems[counter].trim() == ''){
+        totalItemsEmpty++;
       }
     }
+    finalLength = arrayOfItems.length - totalItemsEmpty;
+
+    if(finalLength == 0){
+      return NO_DATA;
+    }
+    if (finalLength <= 3){
+      return OK_ENJOY;
+    }
+
+    return OK_TOOMUCH;
   }
-})()
+}
+
+})();
